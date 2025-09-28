@@ -1,33 +1,9 @@
-/*
- * PSn00bSDK basic graphics example
- * (C) 2020-2023 Lameguy64, spicyjpeg - MPL licensed
- *
- * A comprehensive "advanced hello world" example showing how to set up the
- * screen with double buffering, draw basic graphics (a bouncing square) and use
- * PSn00bSDK's debug font API to quickly print some text, all while following
- * best practices. This is not necessarily the simplest hello world example and
- * may look daunting at first glance, but it is a good starting point for more
- * complex programs.
- *
- * In order to avoid cluttering the program with global variables (as many Sony
- * SDK examples and other PSn00bSDK examples written before this one do) two
- * custom structures are employed:
- *
- * - a RenderBuffer structure containing the DISPENV and DRAWENV objects that
- *   represent the location of the framebuffer in VRAM, as well as the ordering
- *   table (OT) used to sort GPU commands/primitives by their Z index and the
- *   actual buffer commands will be written to;
- * - a RenderContext structure holding two RenderBuffer instances plus some
- *   variables to keep track of which buffer is currently being drawn and how
- *   much of its primitive buffer has been filled up so far.
- *
- * A C++ version of this example is also available (see examples/hellocpp).
- */
-
 #include <stddef.h>
 #include <stdint.h>
 #include <psxgpu.h>
 #include <stdio.h>
+#include <psxcd.h>
+#include <stdlib.h>
 
 #define SCREEN_XRES	640
 #define SCREEN_YRES	480
@@ -37,23 +13,23 @@
 DISPENV disp;
 DRAWENV draw;
 
-char		pribuff[2][65536];		/* Primitive packet buffers */
-uint32_t	ot[2][OT_LEN];			/* Ordering tables */
-char		*nextpri;				/* Pointer to next packet buffer offset */
-int			db = 0;					/* Double buffer index */
+char		pribuff[2][65536];
+uint32_t	ot[2][OT_LEN];
+char*		nextpri;
+int			db = 0;
 
-extern const uint32_t	beeroux[];
+uint32_t*	beeroux = NULL;
 
 static void	init(void);
+static uint32_t*	load_tex(TIM_IMAGE* img, const char* path);
 
 int main(int argc, const char **argv) {
-	printf("Hello world!\n");
 	TIM_IMAGE	img;
 	POLY_FT4*	sprite;
-
+	
 	init();
-
-	GetTimInfo(beeroux, &img);
+	
+	beeroux = load_tex(&img, "\\ASSETS\\BEEROUX.TIM;1");
 
 	if (img.mode & 0x8)
 		LoadImage(img.crect, img.caddr);
@@ -95,9 +71,8 @@ int main(int argc, const char **argv) {
 }
 
 static void	init(void) {
-	
 	printf("Init GPU... ");
-	ResetGraph( 0 );
+	ResetGraph(0);
 	printf("Done.\n");
 
 	printf("Set video mode... ");
@@ -116,4 +91,35 @@ static void	init(void) {
 	SetDispMask( 1 );
 
 	printf("Done.\n");
+
+	printf("Init CdRom... ");
+	CdInit();
+	printf("Done.\n");
+}
+
+static uint32_t*	load_tex(TIM_IMAGE* img, const char* path) {
+	CdlFILE		loc;
+	uint32_t*	buffer;
+
+	printf("loading %s\n", path);
+
+	if (CdSearchFile(&loc, path) == NULL) {
+		return NULL;
+	}
+
+	buffer = malloc(loc.size);
+
+	CdControl(CdlSetloc, &loc, NULL);
+
+	CdRead(loc.size / 2048, buffer, CdlModeIgnore);
+
+	GetTimInfo(buffer, img);
+
+	if (img->mode & 0x8)
+		LoadImage(img->crect, img->caddr);
+	LoadImage(img->prect, img->paddr);
+
+	printf("Done\n");
+
+	return buffer;
 }

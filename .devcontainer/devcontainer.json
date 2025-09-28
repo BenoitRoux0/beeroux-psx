@@ -1,0 +1,14 @@
+{
+  "name": "psn00bsdk Dev Container",
+  "image": "psn00bsdk-builder:latest",
+  "customizations": {
+    "vscode": {
+        "extensions": [
+            "ms-vscode.cmake-tools",
+            "ms-vscode.cpptools",
+            "ms-vscode.cpptools-extension-pack",
+            "ms-vscode.cpptools-themes"
+        ]
+    }
+  }
+}

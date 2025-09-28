@@ -60,7 +60,7 @@
 		-->
 		<directory_tree>
 			<file name="SYSTEM.CNF"		type="data" source="${PROJECT_SOURCE_DIR}/system.cnf" />
-			<file name="BEEROUX.EXE"	type="data" source="beeroux.exe" />
+			<file name="BEEROUX.EXE"	type="data" source="${PROJECT_SOURCE_DIR}/build/beeroux.exe" />
 			<!--
 				This file is only required if you are using dynamic linking
 				(see the system/dynlink example). It contains the executable's
@@ -69,7 +69,11 @@
 			-->
 			<!--<file name="TEMPLATE.MAP"	type="data" source="template.map" />-->
 
-			<dummy sectors="1024"/>
+			<dir name="ASSETS">
+				<file name="BEEROUX.TIM"	type="data" source="${PROJECT_SOURCE_DIR}/assets/Beeroux_square.tim" />
+			</dir>
+
+			<!-- <dummy sectors="1024"/> -->
 		</directory_tree>
 	</track>
 

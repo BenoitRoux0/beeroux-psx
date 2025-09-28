@@ -17,13 +17,11 @@ psn00bsdk_add_executable(beeroux GPREL src/main.c)
 
 
 psn00bsdk_add_cd_image(
-	iso      # Target name
-	beeroux    # Output file name (= beeroux.bin + beeroux.cue)
-	iso.xml  # Path to config file
+	iso
+	beeroux
+	iso.xml
 	DEPENDS beeroux system.cnf
 )
-
-psn00bsdk_target_incbin(beeroux PRIVATE beeroux assets/Beeroux_square.tim)
 
 install(
 	FILES

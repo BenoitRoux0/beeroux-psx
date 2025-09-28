@@ -11,7 +11,11 @@
 			"displayName":   "Default configuration",
 			"description":   "Use this preset to build the project using PSn00bSDK.",
 			"generator":     "Ninja",
-			"toolchainFile": "$env{PSN00BSDK_LIBS}/cmake/sdk.cmake",
+			"environment": {
+				"PATH": "/usr/local/psn00bsdk/bin:$penv{PATH}",
+				"PSN00BSDK_LIBS": "/usr/local/psn00bsdk/lib/libpsn00b"
+			},
+			"toolchainFile": "/usr/local/psn00bsdk/lib/libpsn00b/cmake/sdk.cmake",
 			"binaryDir":     "${sourceDir}/build",
 			"cacheVariables": {
 				"CMAKE_BUILD_TYPE": "Debug",
